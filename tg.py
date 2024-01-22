@@ -19,7 +19,8 @@ def handle_start(message):
 
 def handle_name(message, chat_id):
     name = message.text
-    bot.send_message(chat_id, 'Введите ваш номер телефона:')
+    bot.send_message(chat_id, 'Отправьте нам свой номер телефона')
+    button = types.KeyboardButton(text="Отправить геолокацию", request_contact=True)
     bot.register_next_step_handler(message, handle_phone_number, chat_id, name)
 
 def handle_phone_number(message, chat_id, name):
@@ -37,7 +38,7 @@ def handle_telegram_id(message, chat_id, name, phone_number):
 
 @bot.message_handler(commands=['buy'])
 def buy(message):
-    bot.send_message(message.chat,)
+    bot.send_message(message.chat.id,'Для того что бы найти магазины рядом с вами отправьте нам свою геолокацию')
     # Создаем кнопку с запросом геолокации
     button = types.KeyboardButton(text="Отправить геолокацию", request_location=True)
     keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
