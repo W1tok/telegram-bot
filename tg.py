@@ -35,3 +35,24 @@ def handle_telegram_id(message, chat_id, name, phone_number):
     bot.send_message(chat_id, 'Регистрациия закончена.Благодарим вас за предоставленную информацию!')
 
 
+@bot.message_handler(commands=['buy'])
+def buy(message):
+    bot.send_message(message.chat,)
+    # Создаем кнопку с запросом геолокации
+    button = types.KeyboardButton(text="Отправить геолокацию", request_location=True)
+    keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
+    keyboard.add(button)
+
+    # Отправляем сообщение с кнопкой пользователю
+    bot.send_message(message.chat.id, "Нажмите кнопку, чтобы отправить геолокацию", reply_markup=keyboard)
+
+
+# Обработка полученной геолокации
+@bot.message_handler(content_types=['location'])
+def handle_location(message):
+    latitude = message.location.latitude
+    longitude = message.location.longitude
+
+    bot.reply_to(message, f"Получена геолокация: ({latitude}, {longitude})")
+
+bot.polling()
