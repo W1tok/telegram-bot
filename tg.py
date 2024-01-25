@@ -1,6 +1,12 @@
+from unittest.mock import call
+
 import telebot
 from telebot import types
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+
+
 bot = telebot.TeleBot('6786523965:AAEK-NVDmwdS5TXPX1M9nX3-yDlHRtiMHGo')
+ret = ""
 
 class User:
     def __init__(self, name, phone_number, telegram_id):
@@ -85,7 +91,26 @@ def handle_telegram_id(message, chat_id, name, phone_number):
 #             bot.send_message(message.chat.id, f'{name}: {lat}, {lon}')
 #     else:
 #         bot.send_message(message.chat.id, 'Произошла ошибка при поиске места')
-п
+
+
+@bot.message_handler(commands=['buy'])
+def buy(message):
+    keyboard = InlineKeyboardMarkup()
+    mas = ["Аптеки","Фаст-Фуд","Магазины"]
+    chat_id = message.chat.id
+    bot.send.message(chat_id, 'Отправь свое местоположение для поиска подходящего места')
+    # Получаем координаты пользователя
+    lat = message.location.latitude
+    lon = message.location.longitude
+    bot.send.message(chat_id, 'Теперь выберем категорию мест, которые вы хотите найти')
+    for i in mas:
+        i = types.InlineKeyboardButton(text=f"{i}", callback_data=f"{i}")
+        keyboard.add(i)
+
+
+
+
+
 
 
 bot.polling()
