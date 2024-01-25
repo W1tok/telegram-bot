@@ -113,7 +113,9 @@ def handle_telegram_id(message, chat_id, name, phone_number):
 #
 #
 #
-
+def get_message(message):
+    mess = message.text
+    return mess
 
 @bot.message_handler(commands=['buy'])
 def buy(message):
@@ -125,48 +127,43 @@ def buy(message):
 
 @bot.message_handler(content_types=['location'])
 def location(message):
-    jr = 1
+    chat_id = message.chat.id
+
     keyboard = types.ReplyKeyboardMarkup()
+
     lat = message.location.latitude
     lon = message.location.longitude
-    mas = ["Аптеки", "Фаст-Фуды", "Магазины"]
-    bot.send_message(message.chat.id, 'Теперь выберем категорию мест, которые вы хотите найти')
-    for i in mas:
-        keyboard.add(InlineKeyboardButton(text=f"{i}", callback_data=f"{i}"))
-        bot.send_message(message.chat.id, f"вариант{jr}",reply_markup=keyboard )
-        jr +=1
-@bot.callback_query_handler(func=lambda call: True)
-def handle_callback(call,message):
 
+    # bot.send_message(chat_id, 'Теперь выберем категорию мест, которые вы хотите найти(атпека,фаст-фуд,магазин')
+    # option = get_message(message)
+    # time.sleep(7)
 
-    user_id = call.from_user.id
-    chat_id = message.chat.id
-    option = call.data
-
-
-    bot.send_message(chat_id,
-                      "Теперь давайте определимся c конкретным местом(филлиалом).Для этого напишите название места или филлиала")
-    mesto = message.text
+    bot.send_message(chat_id,"Теперь давайте определимся c конкретным местом(филлиалом).Для этого напишите название места или филлиала")
+    mesto = get_message(message)
+    time.sleep(7)
 
     bot.send_message(chat_id, "В каком радиусе вы хотите сделать поиск")
-    radius = message.text
-    url = f"https://nominatim.openstreetmap.org/search?format=json&lat={lat}&lon={lon}&{radius}&q={option + mesto}"
+    radius = get_message(message)
+    time.sleep(7)
+    # res = str(option) + str(mesto)
+    url = f"https://nominatim.openstreetmap.org/search?format=json&lat={lat}&lon={lon}&{radius}&q={mesto}"
 
-    # Отправляем запрос и оплучаем  ответ в формате json
-    respone = requests.get(url)
-    data = respone.json()
+    # Отправляем запрос и получаем ответ в формате json
+    response = requests.get(url)
+    data = response.json()
 
     # Формируем ответ
     if len(data) > 0:
         keyboard = InlineKeyboardMarkup()
         for i in data:
+            place_name = i['display_name']
             place_lat = i['lat']
             place_lon = i['lon']
 
             # Вычисляем расстояние от пользователя до места
             distance = calculate_distance(lat, lon, float(place_lat), float(place_lon))
 
-            button_text = f"{i['place_name']} ({round(distance, 2)} км)"
+            button_text = f"{place_name} ({round(distance, 2)} км)"
             keyboard.add(InlineKeyboardButton(button_text, callback_data=f"{place_lat},{place_lon}"))
 
         bot.send_message(chat_id, "Выберете место", reply_markup=keyboard)
