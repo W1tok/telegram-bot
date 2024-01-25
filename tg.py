@@ -85,7 +85,7 @@ def handle_telegram_id(message, chat_id, name, phone_number):
 #             bot.send_message(message.chat.id, f'{name}: {lat}, {lon}')
 #     else:
 #         bot.send_message(message.chat.id, 'Произошла ошибка при поиске места')
-
+п
 
 
 bot.polling()
