@@ -175,5 +175,23 @@ def calculate_distance(lat1, lon1, lat2, lon2):
     distance = math.sqrt((lat2 - lat1) ** 2 + (lon2 - lon1) ** 2)
     return distance
 
+@bot.message_handler(commands=['help'])
+def helping(message):
+    bot.send_message(message.chat.id,"/start - регестрация")
+    bot.send_message(message.chat.id,"/buy - найти место")
+    bot.send_message(message.chat.id,"/helpme - что бы найти нужное место, пройдите регистрацию, далее напишите команду /buy и следуйте инструкцям бота")
+    bot.send_message(message.chat.id, "/help - помощь с ботом")
+
+
+@bot.message_handler(commands=['helpme'])
+def helping(message):
+    bot.send_message(message.chat.id,"helpme - что бы найти нужное место, пройдите регистрацию, далее напишите команду /buy и следуйте инструкцям бота")
+
+
+
+
+
+
+
 
 bot.polling()
