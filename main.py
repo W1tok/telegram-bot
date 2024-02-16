@@ -4,8 +4,13 @@ import telebot
 from telebot import types
 from telebot.types import InlineKeyboardMarkup
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton
+import os
+from dotenv import load_dotenv
 
-bot = telebot.TeleBot('6786523965:AAEK-NVDmwdS5TXPX1M9nX3-yDlHRtiMHGo')
+load_dotenv()
+
+TOKEN = os.getenv('TELEGRAM_TOKEN')
+bot = telebot.TeleBot(TOKEN)
 ret = ""
 
 
@@ -14,9 +19,45 @@ class User:
         self.name = name
         self.phone_number = phone_number
         self.telegram_id = telegram_id
+        self.money = 0
+        self.podpiska = False
 
 
+b = 0
 users = {}
+urll = "https://t.me/bochenskiy"
+
+
+def knopka():
+    markup = types.InlineKeyboardMarkup(row_width=True)
+    link_keyboard1 = types.InlineKeyboardButton(text="1-й Канал", url=urll)
+    check_keyboard = types.InlineKeyboardButton(text="Проверить", callback_data="check")
+    markup.add(link_keyboard1, check_keyboard)
+    return markup
+
+
+@bot.message_handler(commands=["podpiska"])
+def start(message):
+    chat_id = message.chat.id
+    bot.send_message(chat_id, "Проверим подписку на канал", reply_markup=knopka())
+
+
+def check(call):
+    status = ["member", "administrator", "creator"]
+    for i in status:
+        if i == bot.get_chat_member(chat_id="-1001596619527", user_id=call.message.chat.id).status:
+            bot.send_message(call.message.chat.id, "Спасибо!")
+            user.podpiska = True
+            break
+    else:
+        bot.send_message(call.message.chat.id, "Подпишитесь на канал!", reply_markup=knopka())
+
+
+@bot.callback_query_handler(func=lambda call: True)
+def callback(call):
+    if call.data == 'check':
+        bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.id)
+        check(call)
 
 
 def get_message(message):
@@ -26,10 +67,14 @@ def get_message(message):
 
 @bot.message_handler(commands=['start'])
 def handle_start(message):
-    chat_id = message.chat.id
-    bot.send_message(chat_id, 'Привет! Для начала работы с ботом, пожалуйста, предоставьте следующую информацию:')
-    bot.send_message(chat_id, 'Введите ваше имя:')
-    bot.register_next_step_handler(message, handle_name, chat_id)
+    if user.podpiska:
+        chat_id = message.chat.id
+        bot.send_message(chat_id, 'Привет! Для начала работы с ботом, пожалуйста, предоставьте следующую информацию:')
+        bot.send_message(chat_id, 'Введите ваше имя:')
+        bot.register_next_step_handler(message, handle_name, chat_id)
+    else:
+        bot.send_message(message.chat.id, "Для начала, подпишитесь на канал, для этого напишите команду: /podpiska")
+        quit(bot.message_handler())
 
 
 def handle_name(message, chat_id):
@@ -54,16 +99,13 @@ def handle_telegram_id(message, chat_id, name, phone_number):
     telegram_id = message.text
     user = User(name, phone_number, telegram_id)
     users[chat_id] = user
-
     bot.send_message(chat_id, f'Регистрациия закончена.Благодарим вас за предоставленную информацию!')
     bot.send_message(chat_id,
                      f"Ваши данные: Имя:{user.name}, Номер телефона:{user.phone_number}, Телеграмм айди:{user.telegram_id}")
-    bot.send_message(chat_id, "Ваши данные верные?")
-
     yes_button = KeyboardButton("Да")
     no_button = KeyboardButton("Нет")
     keyboard.add(yes_button, no_button)
-    bot.send_message(chat_id, "Нажмите на кнопку", reply_markup=keyboard)
+    bot.send_message(chat_id, "Ваши данные верные?", reply_markup=keyboard)
     bot.register_next_step_handler(message, result_yes_or_no, user)
 
 
@@ -72,7 +114,8 @@ def result_yes_or_no(message, user):
     if result == "Да":
         bot.send_message(message.chat.id, f"Отлично,{user.name}.Давайте продолжим работу с ботом!")
     elif result == "Нет":
-        bot.send_message(message.chat.id, f"Увы, но вам придется пройти регистрацию заново.В этот раз не ошибитесь,{user.name}")
+        bot.send_message(message.chat.id,
+                         f"Увы, но вам придется пройти регистрацию заново.В этот раз не ошибитесь,{user.name}")
 
 
 @bot.message_handler(commands=['buy'])
@@ -80,18 +123,19 @@ def buy(message):
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     button = KeyboardButton("Отправить геолокацию", request_location=True)
     keyboard.add(button)
-    bot.send_message(message.chat.id, "Пожалуйста, отправьте свою геолокацию, нажав на кнопку", reply_markup=keyboard)
+    bot.send_message(message.chat.id, "Пожалуйста, отправьте свою геолокацию, нажав на кнопку",
+                     reply_markup=keyboard)
     bot.register_next_step_handler(message, handle_location)
+
+
 
 
 @bot.message_handler(content_types=['location'])
 def handle_location(message):
     lat = message.location.latitude
     lon = message.location.longitude
-
     # bot.send_message(chat_id, 'Теперь выберем категорию мест, которые вы хотите найти(атпека,фаст-фуд,магазин')
     # option = get_message(message)
-
     bot.send_message(message.chat.id,
                      "Теперь давайте определимся c конкретным местом(филлиалом).Для этого напишите название места или филлиала")
     location = get_message(message)
@@ -106,13 +150,10 @@ def handle_radius(message, lat, lon, location):
 
 def handle_poisk(message, lat, lon, location, radius):
     chat_id = message.chat.id
-
     url = f"https://nominatim.openstreetmap.org/search?format=json&lat={lat}&lon={lon}&{radius}&q={location}"
-
     # Отправляем запрос и получаем ответ в формате json
     response = requests.get(url)
     data = response.json()
-
     # Формируем ответ
     if len(data) > 0:
         keyboard = InlineKeyboardMarkup()
@@ -120,13 +161,10 @@ def handle_poisk(message, lat, lon, location, radius):
             place_name = i['display_name']
             place_lat = i['lat']
             place_lon = i['lon']
-
             # Вычисляем расстояние от пользователя до места
             distance = calculate_distance(lat, lon, float(place_lat), float(place_lon))
-
             button_text = f"{place_name} ({round(distance, 2)} км)"
             keyboard.add(InlineKeyboardButton(button_text, callback_data=f"{place_lat},{place_lon}"))
-
         bot.send_message(chat_id, "Выберете место", reply_markup=keyboard)
     else:
         bot.send_message(chat_id, 'Место не найдено')
