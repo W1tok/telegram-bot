@@ -138,10 +138,10 @@ def choosing_a_category(message):
 
 
 def check_result(message):
+    chat_id = message.chat.id
     result = message.text
     poisk = ""
     if result == 'Фаст-Фуд':
-
         choice.Fast_Food()
         res = message.text
         if res == "Вкусно и Точка":
@@ -151,51 +151,42 @@ def check_result(message):
         elif res == "КФС":
             poisk = "КФС"
         elif res == "Другое":
-            poisk = ""
-
-    elif result == 'Аптека':
-        pass
+            bot.send_message(chat_id, "Напишите название места, которое вам нужно")
+            poisk = message.text
+        return poisk
 
     elif result == 'Магазин':
-        pass
+        choice.Apteka()
+        res = message.text
+        if res == "Магнит":
+            poisk = "Магнит"
+        elif res == "Пятерочка":
+            poisk = "Пятерочка"
+        elif res == "Перекресток":
+            poisk = "Перекресток"
+        elif res == "Другое":
+            bot.send_message(chat_id, "Напишите название места, которое вам нужно")
+            poisk = message.text
+        return poisk
+
+    elif result == 'Аптека':
+        choice.Apteka()
+        res = message.text
+        if res == "Магнит Аптека":
+            poisk = "Магнит Аптека"
+        elif res == "Неофарм":
+            poisk = "Неофарм"
+        elif res == "Апрель":
+            poisk = "Апрель"
+        elif res == "Другое":
+            bot.send_message(chat_id, "Напишите название места, которое вам нужно")
+            poisk = message.text
+        return poisk
 
     elif result == 'Другое':
-        pass
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        bot.send_message(chat_id, "Напишите название места, которое вам нужно")
+        poisk = message.text
+        return poisk
 
 
 
