@@ -1,0 +1,53 @@
+import requests
+
+url = "https://pokeapi.co/api/v2/pokemon/ditto"
+
+
+class BasePokemon():
+    def __init__(self, name):
+        self.name = name
+
+
+class Pokemon(BasePokemon):
+    def __init__(self, id, height,weight):
+        self.id = id
+        self.height = height
+        self.weight = weight
+        self.pokemon_list = []
+        self.pokemon_list.append(self.name)
+
+    def __str__(self):
+        return f"Pokemon ID: {self._id}\nName: {self._name}\nHeight: {self._height} cm\nWeight: {self._weight} kg"
+
+
+
+
+class PokeAPI():
+    def __init__(self, id=0,name=0):
+        self.id = id
+        self.name = name
+
+    def get_pokemon(self):
+        if self.id == 0:
+            pass
+        elif self.name == 0:
+            pass
+        else:
+            return "Вы не указали параметры для поиска"
+
+    def get_all(self):
+        if self.get_full == False:
+            b = Pokemon.pokemon.pokemon_list
+            for i in b:
+                return i
+
+        elif self.get_full == True:
+            pass
+
+def get_all(b):
+    
+
+
+
+
+
