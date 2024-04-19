@@ -1,0 +1,39 @@
+import requests
+from iskl import PokeError
+import requests
+from poke import Pokemon, BasePokemon
+
+
+class PokeAPI:
+    @staticmethod
+    def get_pokemon(identifier: str) -> Pokemon:
+        url = f"https://pokeapi.co/api/v2/pokemon/{identifier}"
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            data = response.json()
+            id = data.get('id')
+            name = data.get('name')
+            height = data.get('height')
+            weight = data.get('weight')
+
+            return Pokemon(id, name, height, weight)
+        else:
+            raise PokeError(f"Не удалось получить данные о покемонах для {identifier}")
+
+    @staticmethod
+    def get_all(get_full=False):
+        url = "https://pokeapi.co/api/v2/pokemon"
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            data = response.json()
+            results = data.get('results', [])
+
+            for result in results:
+                if get_full:
+                    yield PokeAPI.get_pokemon(result['name'])
+                else:
+                    yield BasePokemon(result['name'])
+        else:
+            raise PokeError("Failed to fetch all Pokemon data")
