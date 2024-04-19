@@ -1,0 +1,21 @@
+from pokeAPI import PokeAPI
+
+
+# Получение покемона по имени "ditto"
+try:
+    ditto = PokeAPI.get_pokemon('ditto')
+    print(ditto)
+except Exception as e:
+    print(f'Error: {e}')
+
+# Получение первых 50 покемонов
+try:
+    pokemons = []
+    for pokemon in PokeAPI.get_all(get_full=False):
+        pokemons.append(pokemon)
+        if len(pokemons) == 50:
+            tyg_pokemon = max(pokemons,key = lambda x: float(x.weight.split[0]))
+            print(f"Самый тяжелый покемон - {tyg_pokemon}")
+            break
+except Exception as e:
+    print(f"Ошибка: {e}")
