@@ -1,0 +1,39 @@
+# class BasePokemon:
+#     def __init__(self, name: str):
+#         self.name = name
+#
+#     def __str__(self) -> str:
+#         return f'BasePokemon: {self.name}'
+#
+# class Pokemon(BasePokemon):
+#     def __init__(self, id: int, name: str, height: str, weight: str):
+#         super().__init__(name)
+#         self.id = id
+#         self.height = height
+#         self.weight = weight
+#
+#     def __str__(self) -> str:
+#         return f'Pokemon #{self.id}: {self.name}, Height: {self.height}, Weight: {self.weight}'
+
+from dataclasses import dataclass
+
+@dataclass
+class BasePokemon:
+    name: str
+
+
+@dataclass
+class Pokemon(BasePokemon):
+    id: int
+    height: str
+    weight: str
+
+
+class PokemonStats:
+    def __init__(self, hp, attack, defense, special_attack, special_defense, speed):
+        self.hp = hp
+        self.attack = attack
+        self.defense = defense
+        self.special_attack = special_attack
+        self.special_defense = special_defense
+        self.speed = speed
